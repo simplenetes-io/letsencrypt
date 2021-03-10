@@ -1,0 +1,3 @@
+# List of all domains we want to issue certs for.
+# One row for each certificate, multiple domains in the same cert space separated, as:
+# abba.com www.abba.com abba.org www.abba.org

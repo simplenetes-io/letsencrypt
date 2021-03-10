@@ -1,0 +1,5 @@
+@clone: file:1.6.0 string:1.4.0
+
+run:
+    _env:
+        - RUN: RENEWER_RUN

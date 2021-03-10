@@ -1,0 +1,54 @@
+api: 1.0.0-beta1
+runtime: podman
+podVersion: 0.0.86
+
+volumes:
+    - name: certs
+      type: volume
+
+      # The certs_list contains certs.txt, a file which states what certificates to issue.
+    - name: certs_list
+      type: config
+
+containers:
+    - name: renewer
+      # TODO: change to the correct image url
+      image: letsencrypt-renewer:0.84
+      restart: on-interval:86400
+      env:
+          - name: daysUntilExpire
+            value: 20
+      mounts:
+          # New certs are stored to /mnt/certs
+          - volume: certs
+            dest: /mnt/certs
+
+          - volume: certs_list
+            dest: /mnt/certs_list
+      expose:
+            # This is where the letsencrypt service is connecting to.
+          - targetPort: 8080
+            hostPort: ${HOSTPORTAUTO1}
+            clusterPort: ${CLUSTERPORTAUTO1}
+            ingress:
+                - protocol: http
+                  pathBeg: /.well-known/acme-challenge/
+
+    - name: certs_server
+      # This nginx container serves the bundle of certs to anyone internally asking for it.
+      # TODO: change to the correct image url
+      image: letsencrypt-server:0.0.1
+      restart: always
+      signal:
+          - sig: HUP
+      mounts:
+          - volume: certs
+            dest: /mnt/certs
+      expose:
+          - targetPort: 80
+            hostPort: ${HOSTPORTAUTO2}
+            # It is VERY important that this exposed port does NOT have an ingress,
+            # because then anybody could surf in and download the cert bundles.
+            # By fixating the clusterPort to 64000 or above Simplenetes will always
+            # reject any ingress configuration for it.
+            clusterPort: 64000
