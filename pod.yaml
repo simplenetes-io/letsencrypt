@@ -12,8 +12,7 @@ volumes:
 
 containers:
     - name: renewer
-      # TODO: change to the correct image url
-      image: letsencrypt-renewer:0.84
+      image: docker.pkg.github.com/simplenetes-io/letsencrypt/letsencrypt-renewer:0.0.86
       restart: on-interval:86400
       env:
           - name: daysUntilExpire
@@ -36,8 +35,7 @@ containers:
 
     - name: certs_server
       # This nginx container serves the bundle of certs to anyone internally asking for it.
-      # TODO: change to the correct image url
-      image: letsencrypt-server:0.0.1
+      image: docker.pkg.github.com/simplenetes-io/letsencrypt/letsencrypt-server:0.0.86
       restart: always
       signal:
           - sig: HUP
