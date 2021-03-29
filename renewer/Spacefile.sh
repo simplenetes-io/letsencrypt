@@ -139,7 +139,7 @@ _BUNDLE_CERTS()
     local nl="
 "
     local line=
-    printf "%s\\n" "I used to be The Astro Chicken. Not I'm simply a placeholder for empty tar archives..." >".astrochicken"
+    printf "%s\\n" "I used to be The Astro Chicken. Now I'm simply a placeholder for empty tar archives..." >".astrochicken"
     local files=".astrochicken"
     local ifs="${IFS}"
     local IFS="${nl}"
@@ -215,6 +215,7 @@ _CHECK_CONNECTIVITY()
     socat TCP-LISTEN:8080,reuseaddr,fork exec:'sh -c "\"printf \\\"HTTP/1.1 200 OK\\\r\\\nContent-Length: '${#randomID}'\\\r\\\n\\\r\\\n'${randomID}'\\\"\""' &
     pid="$!"
 
+    # TODO: we need to manage spam of this url.
     local content=
     content="$(curl -Ls "http://${domain}/.well-known/acme-challenge/probe")"
 
