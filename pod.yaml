@@ -1,6 +1,6 @@
 api: 1.0.0-beta1
 runtime: podman
-podVersion: 0.0.86
+podVersion: 0.0.87
 
 volumes:
     - name: certs
@@ -12,7 +12,7 @@ volumes:
 
 containers:
     - name: renewer
-      image: docker.pkg.github.com/simplenetes-io/letsencrypt/letsencrypt-renewer:${podVersion}
+      image: ghcr.io/simplenetes-io/letsencrypt-renewer:${podVersion}
       restart: on-interval:86400
       env:
           - name: daysUntilExpire
@@ -35,7 +35,7 @@ containers:
 
     - name: certs_server
       # This nginx container serves the bundle of certs to anyone internally asking for it.
-      image: docker.pkg.github.com/simplenetes-io/letsencrypt/letsencrypt-server:${podVersion}
+      image: ghcr.io/simplenetes-io/letsencrypt-server:${podVersion}
       restart: always
       signal:
           - sig: HUP

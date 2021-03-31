@@ -26,8 +26,8 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: simplenetes-io/letsencrypt/letsencrypt-server
+          registry: ghcr.io
+          repository: simplenetes-io/letsencrypt-server
           path: ./server
           dockerfile: ./server/Dockerfile
           tag_with_ref: true
