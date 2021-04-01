@@ -1,6 +1,6 @@
 api: 1.0.0-beta1
 runtime: podman
-podVersion: 0.1.0
+podVersion: 0.1.1
 
 volumes:
     - name: certs
