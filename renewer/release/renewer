@@ -4,7 +4,7 @@
 #    / __/ _ \/ _ |/ ___/ __/ / __/ // /
 #   _\ \/ ___/ __ / /__/ _/_ _\ \/ _  /
 #  /___/_/  /_/ |_\___/___(_)___/_//_/
-#  version: 1.4.0 | https://space.sh
+#  version: 1.5.0 | https://space.sh
 #
 # Node: /run/
 
@@ -141,7 +141,7 @@ _PERFORM()
         local domains="${line#*[ ]}"
         local domain=
         local isOk=1
-        PRINT "Performing connectivity probes for domains ${domains}..." "info" 0
+        PRINT "Performing connectivity probes for domains \"${domains}\", waiting..." "info" 0
         for domain in ${domains}; do
             if ! _CHECK_CONNECTIVITY "${domain}"; then
                 isOk=0
@@ -199,7 +199,11 @@ _GET_CERTS()
     local domains=
     local hash=
     while IFS='' read -r domains || [ -n "${domains}" ]; do
+        STRING_TRIM "domains"
         if [ "${domains#[#]}" != "${domains}" ]; then
+            continue
+        fi
+        if [ -z "${domains}" ]; then
             continue
         fi
         STRING_HASH "${domains}" hash
@@ -237,6 +241,7 @@ _CHECK_CONNECTIVITY()
     socat TCP-LISTEN:8080,reuseaddr,fork exec:'sh -c "\"printf \\\"HTTP/1.1 200 OK\\\r\\\nContent-Length: '${#randomID}'\\\r\\\n\\\r\\\n'${randomID}'\\\"\""' &
     pid="$!"
 
+    # TODO: we need to manage spam of this url.
     local content=
     content="$(curl -Ls "http://${domain}/.well-known/acme-challenge/probe")"
 
@@ -294,7 +299,7 @@ _BUNDLE_CERTS()
     local nl="
 "
     local line=
-    printf "%s\\n" "I used to be The Astro Chicken. Not I'm simply a placeholder for empty tar archives..." >".astrochicken"
+    printf "%s\\n" "I used to be The Astro Chicken. Now I'm simply a placeholder for empty tar archives..." >".astrochicken"
     local files=".astrochicken"
     local ifs="${IFS}"
     local IFS="${nl}"
@@ -339,6 +344,27 @@ STRING_HASH()
     __hash=$(printf "%s\\n" "${__str}" |${SHASUMBIN}) || { return 1; }
     __hash="${__hash%%[ ]*}"
     eval "${__outvar}=\"\${__hash}\""
+}
+
+STRING_TRIM()
+{
+    local _SPACE_NAME="STRING_TRIM"
+
+    # shellcheck disable=SC2034
+    local __sopriv=
+    eval "__sopriv=\"\${${1}}\""
+    # shellcheck disable=SC2034
+    local __tab="	"
+    while true; do
+        eval "${1}=\"\${$1#\"\${$1%%[! ]*}\"}\""
+        eval "${1}=\"\${$1%\"\${$1##*[! ]}\"}\""
+        eval "${1}=\"\${$1#\"\${$1%%[!\$__tab]*}\"}\""
+        eval "${1}=\"\${$1%\"\${$1##*[!\$__tab]}\"}\""
+        if eval "[ \"\${${1}}\" = \"\${__sopriv}\" ]"; then
+            break
+        fi
+        eval "__sopriv=\"\${${1}}\""
+    done
 }
 
 main()
