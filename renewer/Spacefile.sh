@@ -78,7 +78,7 @@ _PERFORM()
         local domains="${line#*[ ]}"
         local domain=
         local isOk=1
-        PRINT "Performing connectivity probes for domains ${domains}..." "info" 0
+        PRINT "Performing connectivity probes for domains \"${domains}\", waiting..." "info" 0
         for domain in ${domains}; do
             if ! _CHECK_CONNECTIVITY "${domain}"; then
                 isOk=0
@@ -165,7 +165,7 @@ _BUNDLE_CERTS()
 _GET_CERTS()
 {
     SPACE_SIGNATURE="certsList secondsToLive"
-    SPACE_DEP="STRING_HASH PRINT"
+    SPACE_DEP="STRING_HASH PRINT STRING_TRIM"
 
     local certsList="${1}"
     shift
@@ -176,7 +176,11 @@ _GET_CERTS()
     local domains=
     local hash=
     while IFS='' read -r domains || [ -n "${domains}" ]; do
+        STRING_TRIM "domains"
         if [ "${domains#[#]}" != "${domains}" ]; then
+            continue
+        fi
+        if [ -z "${domains}" ]; then
             continue
         fi
         STRING_HASH "${domains}" hash
